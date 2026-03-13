@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日本酒コンシェルジュ | マイページ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- CSS: デザイン・レイアウト --- */
+        :root {
+            --sidebar-width: 260px;
+            --primary-indigo: #1a237e;
+            --soft-blue: #e8eaf6;
+            --accent-gold: #c5a059;
+            --bg-gray: #f8f9fa;
+            --card-white: #ffffff;
+            --text-main: #2c3e50;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Noto Sans JP', sans-serif; background-color: var(--bg-gray); display: flex; color: var(--text-main); min-height: 100vh; }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: #fff;
+            border-right: 1px solid #eee;
+            position: fixed;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+        .logo { font-weight: bold; font-size: 1.4rem; color: var(--primary-indigo); margin-bottom: 40px; text-decoration: none; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
+        .nav-list { list-style: none; }
+        .nav-item { margin-bottom: 10px; }
+        .nav-link { text-decoration: none; color: #555; font-size: 0.9rem; display: block; padding: 12px; border-radius: 8px; transition: var(--transition); }
+        .nav-link:hover, .nav-link.active { background: var(--soft-blue); color: var(--primary-indigo); font-weight: 500; }
+
+        /* Main Content Area */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            padding: 40px;
+        }
+
+        /* AI Concierge (Main Feature) */
+        .concierge-card {
+            background: linear-gradient(135deg, #1a237e, #3949ab);
+            border-radius: 16px;
+            padding: 30px;
+            color: white;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px rgba(26, 35, 126, 0.15);
+            animation: fadeIn 0.8s ease;
+        }
+        .concierge-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+        .ai-avatar { width: 50px; height: 50px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        
+        .chat-area { min-height: 120px; }
+        .chat-bubble {
+            background: rgba(255,255,255,0.15);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--accent-gold);
+            line-height: 1.8;
+            font-weight: 300;
+        }
+
+        .answer-options { display: flex; gap: 12px; flex-wrap: wrap; }
+        .option-btn {
+            background: white;
+            color: var(--primary-indigo);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: var(--transition);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .option-btn:hover { background: var(--accent-gold); color: white; transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.2); }
+
+        /* Dashboard Grid System */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 25px; }
+        .col-main { grid-column: span 8; }
+        .col-side { grid-column: span 4; }
+
+        .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.03); margin-bottom: 25px; transition: var(--transition); }
+        .card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
+        .card-h3 { font-size: 1rem; font-weight: 700; margin-bottom: 18px; border-bottom: 2px solid var(--soft-blue); padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+
+        /* List Items (Sake, Events, Shops) */
+        .list-item { display: flex; gap: 15px; align-items: center; padding: 16px 0; border-bottom: 1px solid #f0f0f0; }
+        .list-item:last-child { border-bottom: none; }
+        .item-img { width: 64px; height: 64px; background: #f0f0f0; border-radius: 8px; object-fit: cover; }
+        .item-info h4 { font-size: 0.95rem; margin-bottom: 4px; color: var(--primary-indigo); }
+        .item-info p { font-size: 0.8rem; color: #666; }
+        .badge { font-size: 0.7rem; padding: 3px 10px; border-radius: 4px; background: var(--soft-blue); color: var(--primary-indigo); margin-top: 6px; display: inline-block; font-weight: 500; }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Mobile Adjustments */
+        @media (max-width: 1050px) {
+            .col-main, .col-side { grid-column: span 12; }
+            .sidebar { width: 70px; padding: 20px 10px; }
+            .nav-text, .logo span { display: none; }
+            .main-content { margin-left: 70px; width: calc(100% - 70px); padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <a href="#" class="logo">🍶<span>Concierge</span></a>
+        <nav>
+            <ul class="nav-list">
+                <li class="nav-item"><a href="#" class="nav-link active"><span class="nav-text">マイページ</span></a></li>
+                <li class="nav-item"><a href="#" class="nav-link"><span class="nav-text">日本酒診断</span></a></li>
+                <li class="nav-item"><a href="#" class="nav-link"><span class="nav-text">イベントを探す</span></a></li>
+                <li class="nav-item"><a href="#" class="nav-link"><span class="nav-text">提供店マップ</span></a></li>
+                <li class="nav-item"><a href="#" class="nav-link"><span class="nav-text">マイログ</span></a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        
+        <section class="concierge-card">
+            <div class="concierge-header">
+                <div class="ai-avatar">🤖</div>
+                <div>
+                    <h2 style="font-size: 1.2rem;">AI日本酒コンシェルジュ</h2>
+                    <p style="font-size: 0.8rem; opacity: 0.8;">あなたの今の気分を教えてください</p>
+                </div>
+            </div>
+
+            <div class="chat-area">
+                <div class="chat-bubble" id="ai-text">
+                    こんにちは、小林さん。お疲れ様です。<br>今夜の最初の一杯、どのような雰囲気で始めましょうか？
+                </div>
+                <div class="answer-options" id="ai-choices">
+                    <button class="option-btn" onclick="step2('和食に合う、すっきりしたお酒')">和食に合う、すっきり系</button>
+                    <button class="option-btn" onclick="step2('フルーティーで華やかなお酒')">フルーティーで華やか</button>
+                    <button class="option-btn" onclick="step2('力強くて飲みごたえのあるお酒')">力強く、飲みごたえ</button>
+                </div>
+            </div>
+        </section>
+
+        <div class="dashboard-grid">
+            
+            <div class="col-main">
+                <section class="card">
+                    <div class="card-h3">AIレコメンド：あなたへの厳選銘柄</div>
+                    <div id="recommendation-list">
+                        <div class="list-item">
+                            <img src="https://images.unsplash.com/photo-1571767424271-96d039976378?auto=format&fit=crop&q=80&w=120" class="item-img">
+                            <div class="item-info">
+                                <h4>純米大吟醸 「静寂」</h4>
+                                <p>石川県・○○酒造 | 雑味のないクリアな味わいが特徴</p>
+                                <span class="badge">マッチ度 98%</span>
+                            </div>
+                        </div>
+                        <div class="list-item">
+                            <img src="https://images.unsplash.com/photo-1516939105342-6e27a9427f41?auto=format&fit=crop&q=80&w=120" class="item-img">
+                            <div class="item-info">
+                                <h4>特別純米 「森の息吹」</h4>
+                                <p>長野県・△△酒造 | 杉の香りが微かに漂う、癒やしの一杯</p>
+                                <span class="badge">今夜のおすすめ</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <div class="card-h3">注目の日本酒イベント</div>
+                    <div class="list-item">
+                        <div style="min-width: 60px; text-align: center; border-right: 2px solid var(--soft-blue); margin-right: 15px;">
+                            <div style="font-size: 1.2rem; font-weight: bold;">4.15</div>
+                            <div style="font-size: 0.7rem; color: #999;">WED</div>
+                        </div>
+                        <div class="item-info">
+                            <h4>【限定招待】若手杜氏と語る「新酒の会」</h4>
+                            <p>場所：中目黒 Sake Lab | 定員：10名（残り3名）</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="col-side">
+                <section class="card">
+                    <div class="card-h3">今すぐ行けるお店</div>
+                    <div class="list-item">
+                        <div class="item-info">
+                            <h4 style="color: var(--accent-gold);">日本酒処 結 -Musubi-</h4>
+                            <p>📍 恵比寿駅 徒歩4分</p>
+                            <span class="badge" style="background: #fff3e0; color: #e65100;">「静寂」入荷中</span>
+                        </div>
+                    </div>
+                    <div class="list-item">
+                        <div class="item-info">
+                            <h4>和モダン居酒屋 蒼</h4>
+                            <p>📍 代官山駅 徒歩2分</p>
+                            <p style="font-size: 0.75rem;">飲み比べセットが充実</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card" style="background: var(--primary-indigo); color: white;">
+                    <div class="card-h3" style="border-color: rgba(255,255,255,0.2);">あなたの好み分析</div>
+                    <div style="text-align: center; padding: 20px 0;">
+                        <div style="font-size: 2.5rem; margin-bottom: 10px;">🍶</div>
+                        <p style="font-size: 0.85rem; opacity: 0.9;">現在は<b>「薫酒（くんしゅ）」</b>タイプです</p>
+                        <div style="margin-top: 15px; height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px;">
+                            <div style="width: 75%; height: 100%; background: var(--accent-gold); border-radius: 3px;"></div>
+                        </div>
+                        <p style="font-size: 0.7rem; margin-top: 8px;">次なる好み：爽酒への関心が高まっています</p>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        /* --- JavaScript: AI対話と動的表示の制御 --- */
+
+        const aiText = document.getElementById('ai-text');
+        const aiChoices = document.getElementById('ai-choices');
+        const recList = document.getElementById('recommendation-list');
+
+        // ステップ2: 料理の好みを聞く
+        function step2(prevChoice) {
+            // AIのテキストを更新（ふわっと切り替えるアニメーション効果を演出可能）
+            aiText.style.opacity = 0;
+            setTimeout(() => {
+                aiText.innerHTML = `「${prevChoice}」ですね。素敵な選択です。<br>合わせたいお料理や、今の空腹具合はいかがですか？`;
+                aiText.style.opacity = 1;
+                
+                aiChoices.innerHTML = `
+                    <button class="option-btn" onclick="finish('お刺身や軽い前菜')">お刺身や軽い前菜</button>
+                    <button class="option-btn" onclick="finish('しっかりめのお肉料理')">しっかりめのお肉料理</button>
+                    <button class="option-btn" onclick="finish('食事は済ませたのでおつまみ程度')">おつまみ程度でゆっくり</button>
+                `;
+            }, 300);
+        }
+
+        // 完了: レコメンド結果を出す
+        function finish(foodChoice) {
+            aiText.style.opacity = 0;
+            setTimeout(() => {
+                aiText.innerHTML = `ありがとうございます。小林さんの今の気分に最適な一本を特定しました。<br><strong>「純米大吟醸 匠」</strong>をご提案します。${foodChoice}との相性も抜群です。`;
+                aiText.style.opacity = 1;
+                
+                aiChoices.innerHTML = `
+                    <button class="option-btn" style="background: var(--accent-gold); color: white;" onclick="location.reload()">もう一度相談する</button>
+                `;
+
+                // レコメンドリストを動的に書き換える（デモ用）
+                updateRecommendations();
+            }, 300);
+        }
+
+        // 診断結果に合わせてリストを更新するシミュレーション
+        function updateRecommendations() {
+            recList.innerHTML = `
+                <div class="list-item" style="animation: fadeIn 0.8s ease;">
+                    <img src="https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&q=80&w=120" class="item-img">
+                    <div class="item-info">
+                        <h4>【AI特選】純米大吟醸 「匠 -TAKUMI-」</h4>
+                        <p>京都府・□□酒造 | 今回の診断に基づいた究極のマッチング</p>
+                        <span class="badge" style="background: #fff3e0; color: #e65100;">マッチ度 100%</span>
+                    </div>
+                </div>
+            ` + recList.innerHTML;
+        }
+
+        // シンプルなフェードイン処理
+        aiText.style.transition = "opacity 0.4s ease";
+    </script>
+</body>
+</html>
